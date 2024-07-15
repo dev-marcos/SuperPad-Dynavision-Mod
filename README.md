@@ -1,14 +1,15 @@
 # SuperPad Dynavision Mod
 
-Este repositório contém o código e as instruções para modificar o controle Super Pad do console Dynavision da Dynacom. A modificação utiliza uma placa ESP32 C3 Supermini para ler o estado dos botões e controlar um LED. O projeto é desenvolvido na IDE do Arduino e é configurado para ser compilado e carregado usando o Platform.io.
+Este repositório contém o código e as instruções para modificar o controle Super Pad do console Dynavision da Dynacom. A modificação utiliza uma placa ESP32 C3 Supermini para ler o estado dos botões, controlar um LED e funcionar como um gamepad Bluetooth. O projeto é desenvolvido na IDE do Arduino e é configurado para ser compilado e carregado usando o Platform.io.
 
 ## Características
-- Leitura dos estados dos botões UP, DOWN, LEFT, RIGHT, SELECT, START, A, B, X e Y.
+- Leitura dos estados dos botões UP, DOWN, LEFT, RIGHT, SELECT, START, A, B, X e Y com debouncing.
 - Exibição dos botões pressionados via serial.
 - Controle de um LED indicador.
 - Configuração dos botões como entradas com pull-up.
 - Compatível com a placa ESP32 C3 Supermini.
 - Suporte a Bluetooth utilizando a biblioteca `ESP32-BLE-Gamepad`.
+- Modo de emparelhamento ativado por pressionar START e SELECT por 5 segundos.
 
 ## Requisitos
 - Placa ESP32 C3 Supermini
