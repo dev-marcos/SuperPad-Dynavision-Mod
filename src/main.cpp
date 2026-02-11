@@ -5,17 +5,18 @@
 #define BOUNCE_WITH_PROMPT_DETECTION
 
 // Definição dos pinos dos botões e LED
-const int pinUp = 2;
-const int pinDown = 0;
-const int pinLeft = 3;
-const int pinRight = 1;
-const int pinSelect = 6;
-const int pinStart = 4;
-const int pinA = 9;
-const int pinB = 10;
-const int pinX = 8;
-const int pinY = 7;
-const int pinLED = 5;
+const int pinUp = 10;
+const int pinDown = 8;
+const int pinLeft = 20;
+const int pinRight = 9;
+const int pinSelect = 4;
+const int pinStart = 7;
+const int pinA = 2;
+const int pinB = 3;
+const int pinX = 1;
+const int pinY = 0;
+const int pinLED = 21;
+const int pinBateria = 5; // Pino analógico para leitura do valor da bateria
 
 // Debouncers
 Bounce debouncerUp = Bounce();
@@ -32,6 +33,20 @@ Bounce debouncerY = Bounce();
 BleGamepad bleGamepad("Super Pad Dynavision", "Dynacom", 100);
 unsigned long startSelectPressTime = 0;
 const unsigned long pairHoldTime = 5000; // 5 seconds
+
+// Variáveis para debug de bateria
+unsigned long lastDebugTime = 0;
+const unsigned long debugInterval = 500; // Atualiza a cada 500ms
+
+// Função para ler a tensão da bateria
+float readBatteryVoltage() {
+    int rawValue = analogRead(pinBateria);
+    // Conversão: rawValue (0-4095) -> Tensão ADC (0-3.3V)
+    // Tensão real da bateria = Tensão ADC * 2 (devido ao divisor de tensão 100k+100k)
+    float adcVoltage = (rawValue / 4095.0) * 3.3;
+    float batteryVoltage = adcVoltage * 2.0;
+    return batteryVoltage;
+}
 
 void setup() {
     Serial.begin(115200);
@@ -90,6 +105,34 @@ void loop() {
     debouncerB.update();
     debouncerX.update();
     debouncerY.update();
+
+    // Debug: Exibe estado dos botões e bateria a cada 500ms
+    if (millis() - lastDebugTime >= debugInterval) {
+        lastDebugTime = millis();
+        
+        float batteryVoltage = readBatteryVoltage();
+        
+        Serial.println("=== SUPER PAD DEBUG ===");
+        Serial.print("Bateria: ");
+        Serial.print(batteryVoltage, 2);
+        Serial.println("V");
+        
+        Serial.print("Botões [U:"); Serial.print(debouncerUp.read() == LOW ? "1" : "0");
+        Serial.print(" D:"); Serial.print(debouncerDown.read() == LOW ? "1" : "0");
+        Serial.print(" L:"); Serial.print(debouncerLeft.read() == LOW ? "1" : "0");
+        Serial.print(" R:"); Serial.print(debouncerRight.read() == LOW ? "1" : "0");
+        Serial.print(" SEL:"); Serial.print(debouncerSelect.read() == LOW ? "1" : "0");
+        Serial.print(" STR:"); Serial.print(debouncerStart.read() == LOW ? "1" : "0");
+        Serial.print(" A:"); Serial.print(debouncerA.read() == LOW ? "1" : "0");
+        Serial.print(" B:"); Serial.print(debouncerB.read() == LOW ? "1" : "0");
+        Serial.print(" X:"); Serial.print(debouncerX.read() == LOW ? "1" : "0");
+        Serial.print(" Y:"); Serial.print(debouncerY.read() == LOW ? "1" : "0");
+        Serial.println("]");
+        
+        Serial.print("BLE: ");
+        Serial.println(bleGamepad.isConnected() ? "Conectado" : "Desconectado");
+        Serial.println("");
+    }
 
     if (bleGamepad.isConnected()) {
         // Liga o LED se estiver conectado
